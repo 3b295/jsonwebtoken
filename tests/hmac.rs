@@ -220,3 +220,22 @@ fn verify_hs256_rfc7517_appendix_a1() {
     let c = decode::<C>(token, &key, &validation).unwrap();
     assert_eq!(c.claims.iss, "joe");
 }
+
+
+#[test]
+#[wasm_bindgen_test]
+fn sign_sm3() {
+    let result =
+        sign(b"hello, world", &EncodingKey::from_base64_secret("mysecret").unwrap(), Algorithm::HSM3).unwrap();
+    let expected = "xPKzFeXC77djdLexnRB5-Krmr4dUnyYcX5WOvLxrzNs";
+    assert_eq!(result, expected);
+}
+
+#[test]
+#[wasm_bindgen_test]
+fn verify_sm3() {
+    let sig = "xPKzFeXC77djdLexnRB5-Krmr4dUnyYcX5WOvLxrzNs";
+    let valid = verify(sig, b"hello, world", &DecodingKey::from_base64_secret("mysecret").unwrap(), Algorithm::HSM3)
+        .unwrap();
+    assert!(valid);
+}

@@ -1,3 +1,4 @@
+use hmac_sm3::hmac_sm3;
 use ring::constant_time::verify_slices_are_equal;
 use ring::{hmac, signature};
 
@@ -18,6 +19,12 @@ pub(crate) fn sign_hmac(alg: hmac::Algorithm, key: &[u8], message: &[u8]) -> Str
     b64_encode(digest)
 }
 
+/// HMac + SM3 签名. (ring 不支持 sm3)
+pub(crate) fn sign_hmac_sm3(key: &[u8], message: &[u8]) -> String {
+    let digest = hmac_sm3(key, message);
+    b64_encode(digest)
+}
+
 /// Take the payload of a JWT, sign it using the algorithm given and return
 /// the base64 url safe encoded of the result.
 ///
@@ -27,6 +34,7 @@ pub fn sign(message: &[u8], key: &EncodingKey, algorithm: Algorithm) -> Result<S
         Algorithm::HS256 => Ok(sign_hmac(hmac::HMAC_SHA256, key.inner(), message)),
         Algorithm::HS384 => Ok(sign_hmac(hmac::HMAC_SHA384, key.inner(), message)),
         Algorithm::HS512 => Ok(sign_hmac(hmac::HMAC_SHA512, key.inner(), message)),
+        Algorithm::HSM3 => Ok(sign_hmac_sm3(key.inner(), message)),
 
         Algorithm::ES256 | Algorithm::ES384 => {
             ecdsa::sign(ecdsa::alg_to_ec_signing(algorithm), key.inner(), message)
@@ -72,7 +80,7 @@ pub fn verify(
     algorithm: Algorithm,
 ) -> Result<bool> {
     match algorithm {
-        Algorithm::HS256 | Algorithm::HS384 | Algorithm::HS512 => {
+        Algorithm::HS256 | Algorithm::HS384 | Algorithm::HS512 | Algorithm::HSM3 => {
             // we just re-sign the message with the key and compare if they are equal
             let signed = sign(message, &EncodingKey::from_secret(key.as_bytes()), algorithm)?;
             Ok(verify_slices_are_equal(signature.as_ref(), signed.as_ref()).is_ok())
