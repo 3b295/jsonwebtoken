@@ -226,7 +226,7 @@ fn verify_hs256_rfc7517_appendix_a1() {
 #[wasm_bindgen_test]
 fn sign_sm3() {
     let result =
-        sign(b"hello, world", &EncodingKey::from_base64_secret("mysecret").unwrap(), Algorithm::HSM3).unwrap();
+        sign(b"hello, world", &EncodingKey::from_base64_secret("mysecret").unwrap(), Algorithm::SM3).unwrap();
     let expected = "xPKzFeXC77djdLexnRB5-Krmr4dUnyYcX5WOvLxrzNs";
     assert_eq!(result, expected);
 }
@@ -235,7 +235,7 @@ fn sign_sm3() {
 #[wasm_bindgen_test]
 fn verify_sm3() {
     let sig = "xPKzFeXC77djdLexnRB5-Krmr4dUnyYcX5WOvLxrzNs";
-    let valid = verify(sig, b"hello, world", &DecodingKey::from_base64_secret("mysecret").unwrap(), Algorithm::HSM3)
+    let valid = verify(sig, b"hello, world", &DecodingKey::from_base64_secret("mysecret").unwrap(), Algorithm::SM3)
         .unwrap();
     assert!(valid);
 }

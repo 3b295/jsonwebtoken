@@ -21,8 +21,8 @@ pub enum Algorithm {
     HS384,
     /// HMAC using SHA-512
     HS512,
-    /// HSM3 using SM3
-    HSM3,
+    /// SM3 using SM3
+    SM3,
 
     /// ECDSA using SHA-256
     ES256,
@@ -55,7 +55,7 @@ impl FromStr for Algorithm {
             "HS384" => Ok(Algorithm::HS384),
             "HS512" => Ok(Algorithm::HS512),
             // FIXME: myy 无规定 HMac + SM3 应该叫什么, 这里暂时用 SM3
-            "SM3" => Ok(Algorithm::HSM3),
+            "SM3" => Ok(Algorithm::SM3),
             "ES256" => Ok(Algorithm::ES256),
             "ES384" => Ok(Algorithm::ES384),
             "RS256" => Ok(Algorithm::RS256),
@@ -73,7 +73,7 @@ impl FromStr for Algorithm {
 impl Algorithm {
     pub(crate) fn family(self) -> AlgorithmFamily {
         match self {
-            Algorithm::HS256 | Algorithm::HS384 | Algorithm::HS512 |Algorithm::HSM3 => AlgorithmFamily::Hmac,
+            Algorithm::HS256 | Algorithm::HS384 | Algorithm::HS512 |Algorithm::SM3 => AlgorithmFamily::Hmac,
             Algorithm::RS256
             | Algorithm::RS384
             | Algorithm::RS512

@@ -34,7 +34,7 @@ pub fn sign(message: &[u8], key: &EncodingKey, algorithm: Algorithm) -> Result<S
         Algorithm::HS256 => Ok(sign_hmac(hmac::HMAC_SHA256, key.inner(), message)),
         Algorithm::HS384 => Ok(sign_hmac(hmac::HMAC_SHA384, key.inner(), message)),
         Algorithm::HS512 => Ok(sign_hmac(hmac::HMAC_SHA512, key.inner(), message)),
-        Algorithm::HSM3 => Ok(sign_hmac_sm3(key.inner(), message)),
+        Algorithm::SM3 => Ok(sign_hmac_sm3(key.inner(), message)),
 
         Algorithm::ES256 | Algorithm::ES384 => {
             ecdsa::sign(ecdsa::alg_to_ec_signing(algorithm), key.inner(), message)
@@ -80,7 +80,7 @@ pub fn verify(
     algorithm: Algorithm,
 ) -> Result<bool> {
     match algorithm {
-        Algorithm::HS256 | Algorithm::HS384 | Algorithm::HS512 | Algorithm::HSM3 => {
+        Algorithm::HS256 | Algorithm::HS384 | Algorithm::HS512 | Algorithm::SM3 => {
             // we just re-sign the message with the key and compare if they are equal
             let signed = sign(message, &EncodingKey::from_secret(key.as_bytes()), algorithm)?;
             Ok(verify_slices_are_equal(signature.as_ref(), signed.as_ref()).is_ok())
